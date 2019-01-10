@@ -8,6 +8,8 @@
 
 imgsArr = [];
 structure = '<div id="slider-holder">' +
+              '<a id="moveRight"></a>' +
+              '<a id="moveLeft"></a>' +
               '<div id="images-holder">' +
                 '<div class="slide first-image"></div>' +
                 '<div class="slide left-image"></div>' +
@@ -16,7 +18,9 @@ structure = '<div id="slider-holder">' +
                 '<div class="slide last-image"></div>' +
               '</div>' +
               '<div id="control-holder">' +
-                '<div class="left-holder"></div><div class="main-holder"></div><div class="right-holder"></div>' +
+                '<div class="left-holder"><i class="first left glyphicon glyphicon-menu-left"></i><i class="second left glyphicon glyphicon-menu-left"></i></div>' +
+                '<div class="main-holder"><p style="display: none"></p></div>' +
+                '<div class="right-holder"><i class="first right glyphicon glyphicon-menu-right"></i><i class="second right glyphicon glyphicon-menu-right"></i></div>' +
               '</div>' +
             '</div>';
 imgStructure = '<div class="img-holder"><img src="" data-key=""></div>';
@@ -26,8 +30,8 @@ $.fn.ataaSlider = function(userOptions){
   options = $.extend({}, $.fn.ataaSlider.defaults, userOptions);
   ataaSlider = $(this);
   initialize(ataaSlider);
-
-
+  $('#moveRight').on('click',moveRight);
+  $('#moveLeft').on('click',moveLeft);
 };
 
 $.fn.ataaSlider.defaults =
@@ -91,17 +95,22 @@ function initialize(slider){
   addImage($('#images-holder .right-image'), imgsArr[3]);
   addImage($('#images-holder .last-image'), imgsArr[4]);
   imgsArr[2].active = true;
+  $('.main-holder p').text(imgsArr[2].desc);
+  $('.main-holder p').fadeIn();
 
   $('.first-image').css('left', firstPosition);
   $('.left-image').css('left', leftPosition);
   $('.main-image').css('left', mainPosition);
   $('.right-image').css('left', rightPosition);
   $('.last-image').css('left', lastPosition);
+
+  startArrowAnimations();
 }
 
-function moveRight(){
+function moveLeft(){
   var key = $('.active img').data('key');
   imgsArr[key].active = false;
+  $('.main-holder p').fadeOut();
 
   var first = $('.first-image');
   var left = $('.left-image');
@@ -119,6 +128,8 @@ function moveRight(){
     left.addClass('active');
     var newKey = left.find('img').data('key');
     imgsArr[newKey].active = true;
+    $('.main-holder p').text(imgsArr[newKey].desc);
+    $('.main-holder p').fadeIn();
     var tempImg = imgsArr.pop();
     imgsArr.unshift(tempImg);
     addImage(last, tempImg);
@@ -149,9 +160,98 @@ function moveRight(){
 
 }
 
+function moveRight(){
+  var key = $('.active img').data('key');
+  console.log(key);
+  imgsArr[key].active = false;
+  $('.main-holder p').fadeOut();
+
+  var first = $('.first-image');
+  var left = $('.left-image');
+  var main = $('.main-image');
+  var right = $('.right-image');
+  var last = $('.last-image');
+
+
+
+  last.animate({
+    left:rightPosition
+  },options.speed);
+  right.animate({
+    left: mainPosition,
+    'padding-top':'0px',
+  },options.speed,function(){
+    right.addClass('active');
+    var newKey = right.find('img').data('key');
+    imgsArr[newKey].active = true;
+    $('.main-holder p').text(imgsArr[newKey].desc);
+    $('.main-holder p').fadeIn();
+    var tempImg = imgsArr.shift();
+    imgsArr.push(tempImg);
+    addImage(first, tempImg);
+  });
+
+  main.animate({
+    'padding-top':'50px',
+    left: leftPosition
+  },options.speed ,function(){
+    main.removeClass('active');
+  });
+
+
+  left.animate({
+    left: firstPosition,
+  },options.speed);
+  first.css('left', 'lastPosition');
+
+  first.addClass('last-image');
+  left.addClass('first-image');
+  main.addClass('left-image');
+  right.addClass('main-image');
+  last.addClass('right-image');
+
+  first.removeClass('first-image');
+  left.removeClass('left-image');
+  main.removeClass('main-image');
+  right.removeClass('right-image');
+  last.removeClass('last-image');
+
+
+}
+
 function addImage(holder, img){
   var imgHTML = $(imgStructure);
   imgHTML.find('img').attr('src', img['src']);
   imgHTML.find('img').attr('data-key', img['key']);
   holder.html(imgHTML);
+}
+
+function startArrowAnimations(){
+  var AnimationSpeed = options.speed * 3;
+  $('.first.right').animate({
+    left: '50%',
+    opacity: 1
+  },AnimationSpeed,function(){
+    $('.first.right').css({left: '0', opacity:0})
+  });
+  $('.second.right').animate({
+    left: '100%',
+    opacity: 0
+  },AnimationSpeed,function(){
+    $('.second.right').css({left: '50%', opacity:1})
+  });
+  $('.first.left').animate({
+    right: '50%',
+    opacity: 1
+  },AnimationSpeed,function(){
+    $('.first.left').css({right: '0', opacity:0})
+  });
+  $('.second.left').animate({
+    right: '100%',
+    opacity: 0
+  },AnimationSpeed,function(){
+    $('.second.left').css({right: '50%', opacity:1});
+    startArrowAnimations();
+  });
+
 }

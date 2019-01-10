@@ -6,6 +6,32 @@
  * info@netmechanics.net
  */
 
+#slider-holder{
+    position: relative;
+}
+
+#moveRight{
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 20%;
+    z-index: 99999;
+    cursor: pointer;
+}
+
+#moveLeft{
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 20%;
+    z-index: 99999;
+    cursor: pointer;
+}
+
 #slider-holder, #images-holder, #control-holder{
     width: 100%;
     overflow: hidden;
@@ -25,59 +51,69 @@
     height: 100%;
     display: inline-block;
     overflow: hidden;
-    margin-left: 10px;
 }
 
 #images-holder .slide:not(.active){
     padding-top: 50px;
 }
 
-.main-image{
-    /*-moz-transition: all 0.6s ease-in-out;*/
-     /*-webkit-transition: all 0.6s ease-in-out;*/
-     /*-o-transition: all 0.6s ease-in-out;*/
-     /*-ms-transition: all 0.6s ease-in-out;*/
-}
-/*.main-image{*/
-    /*width: 60%;*/
-    /*height: 100%;*/
-    /*display: inline-block;*/
-    /*overflow: hidden;*/
-/*}*/
 
-/*.right-image, .left-image{*/
-    /*padding-top: 50px;*/
-    /*width: 20%;*/
-    /*height: 100%;*/
-    /*display: inline-block;*/
-    /*overflow: hidden;*/
-/*}*/
-/*.right-image{*/
-    /*padding-left: 10px;*/
-/*}*/
-
-/*.left-image{*/
-    /*padding-right: 10px;*/
-/*}*/
-
-.img-holder{
+#slider-holder .img-holder{
     overflow: hidden;
     height: 100%;
 }
 
-.img-holder img{
+#slider-holder .img-holder img{
     height: 100%;
     width: 100%;
 }
 
-/*.left-image img{*/
-    /*height: 100%;*/
-    /*position: absolute;*/
-    /*right: 0;*/
-/*}*/
+.first-image,.last-image{
+    z-index: -1;
+}
 
-/*.main-image img{*/
-    /*width: 100%;*/
-    /*height: auto;*/
-    /*min-height: 100%;*/
-/*}*/
+#control-holder>div{
+    display: inline-table;
+    position: relative;
+}
+
+#slider-holder .left-holder, #slider-holder .right-holder{
+    width: 20%;
+    height: 100%;
+}
+
+#slider-holder .main-holder{
+    width: 60%;
+    text-align: center;
+    height: 0;
+}
+
+
+#control-holder i{
+    position: absolute;
+    font-size: x-large;
+}
+
+#slider-holder .first{
+    opacity: 0;
+}
+
+#slider-holder .second{
+    opacity: 1;
+}
+
+#slider-holder .first.right{
+    left:0px;
+}
+
+#slider-holder .second.right{
+    left:50%;
+}
+
+#slider-holder .first.left{
+    right:0px
+}
+
+.second.left{
+    right:50%;
+}
