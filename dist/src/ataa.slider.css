@@ -5,3 +5,79 @@
  * www.netmechanics.net
  * info@netmechanics.net
  */
+
+#slider-holder, #images-holder, #control-holder{
+    width: 100%;
+    overflow: hidden;
+}
+
+#images-holder, #control-holder{
+    margin: 20px 0px;
+}
+
+#images-holder{
+    position: relative;
+}
+
+#images-holder .slide{
+    position: absolute;
+    width: 60%;
+    height: 100%;
+    display: inline-block;
+    overflow: hidden;
+    margin-left: 10px;
+}
+
+#images-holder .slide:not(.active){
+    padding-top: 50px;
+}
+
+.main-image{
+    /*-moz-transition: all 0.6s ease-in-out;*/
+     /*-webkit-transition: all 0.6s ease-in-out;*/
+     /*-o-transition: all 0.6s ease-in-out;*/
+     /*-ms-transition: all 0.6s ease-in-out;*/
+}
+/*.main-image{*/
+    /*width: 60%;*/
+    /*height: 100%;*/
+    /*display: inline-block;*/
+    /*overflow: hidden;*/
+/*}*/
+
+/*.right-image, .left-image{*/
+    /*padding-top: 50px;*/
+    /*width: 20%;*/
+    /*height: 100%;*/
+    /*display: inline-block;*/
+    /*overflow: hidden;*/
+/*}*/
+/*.right-image{*/
+    /*padding-left: 10px;*/
+/*}*/
+
+/*.left-image{*/
+    /*padding-right: 10px;*/
+/*}*/
+
+.img-holder{
+    overflow: hidden;
+    height: 100%;
+}
+
+.img-holder img{
+    height: 100%;
+    width: 100%;
+}
+
+/*.left-image img{*/
+    /*height: 100%;*/
+    /*position: absolute;*/
+    /*right: 0;*/
+/*}*/
+
+/*.main-image img{*/
+    /*width: 100%;*/
+    /*height: auto;*/
+    /*min-height: 100%;*/
+/*}*/
