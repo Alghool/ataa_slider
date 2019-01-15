@@ -6,16 +6,17 @@
  * info@netmechanics.net
  */
 
+ataaSlider = null;
 imgsArr = [];
 structure = '<div id="slider-holder">' +
               '<a id="moveRight"></a>' +
               '<a id="moveLeft"></a>' +
               '<div id="images-holder">' +
-                '<div class="slide first-image"></div>' +
-                '<div class="slide left-image"></div>' +
-                '<div class="slide main-image active"></div>' +
-                '<div class="slide right-image"></div>' +
-                '<div class="slide last-image"></div>' +
+                '<div class="slide "></div>' +
+                '<div class="slide "></div>' +
+                '<div class="slide "></div>' +
+                '<div class="slide "></div>' +
+                '<div class="slide "></div>' +
               '</div>' +
               '<div id="control-holder">' +
                 '<div class="left-holder"><i class="first left glyphicon glyphicon-menu-left"></i><i class="second left glyphicon glyphicon-menu-left"></i></div>' +
@@ -23,15 +24,21 @@ structure = '<div id="slider-holder">' +
                 '<div class="right-holder"><i class="first right glyphicon glyphicon-menu-right"></i><i class="second right glyphicon glyphicon-menu-right"></i></div>' +
               '</div>' +
             '</div>';
-imgStructure = '<div class="img-holder"><img src="" data-key=""></div>';
+imgStructure = '<div class="img-holder"><span class="img-name"></span><img src="" data-key=""></div>';
 options = {};
+moveInterval = 0;
+acting = true;
 
 $.fn.ataaSlider = function(userOptions){
   options = $.extend({}, $.fn.ataaSlider.defaults, userOptions);
   ataaSlider = $(this);
-  initialize(ataaSlider);
-  $('#moveRight').on('click',moveRight);
-  $('#moveLeft').on('click',moveLeft);
+  initialize();
+  $('#moveRight').on('click',function(){
+    moveWrappper(-1);
+  });
+  $('#moveLeft').on('click',function(){
+    moveWrappper(1);
+  });
 };
 
 $.fn.ataaSlider.defaults =
@@ -42,189 +49,139 @@ $.fn.ataaSlider.defaults =
   speed:500
 };
 
-function initialize(slider){
-  var imgs = slider.find('img');
 
-  //set images counters
+function initialize(){
+  var imgs = ataaSlider.find('div');
+
   if(imgs.length < 1){
     console.log("ERROR: no images in slider");
     return false;
-  }else if(imgs.length == 1){
-    slider.append(imgs.clone());
-    slider.append(imgs.clone());
-    slider.append(imgs.clone());
-    slider.append(imgs.clone());
-    slider.append(imgs.clone());
-  }else if(imgs.length == 2){
-    slider.append(imgs.clone());
-    slider.append(imgs[0].clone());
-  }else if(imgs.length < 5){
-    slider.append(imgs.clone());
   }
 
   //get images info into array
-  slider.find('img').each(function(index){
+  imgs.each(function(index){
     var thisImage = $(this);
     imgsArr.push({
       key:index,
-      src:thisImage.attr('src'),
+      src:thisImage.data('src'),
       name:thisImage.data('name'),
-      desc:thisImage.data('desc'),
-      active: false
+      desc:thisImage.data('desc')
     });
   });
   imgs.remove();
 
-  //get positions
-  sliderWidth = slider.width();
-  width60 = sliderWidth * (60/100);
-  width20 = sliderWidth * (20/100);
-  leftPosition = (-1) * (width60 -(width20 - 10));
-  firstPosition = leftPosition - (width60 + 10);
-  mainPosition = width20;
-  rightPosition = width20 + width60 + 10;
-  lastPosition = rightPosition + width60 + 10;
+  //set images counter
+  var i = 0;
+  while(imgsArr.length < 5){
+    var thisImage = imgsArr[i];
+    imgsArr.push({
+      key:imgsArr.length,
+      src:thisImage.src,
+      name:thisImage.name,
+      desc:thisImage.desc
+    });
+    i++;
+  }
 
-  slider.html(structure);
+  //get positions
+  var sliderWidth = ataaSlider.width();
+  var width60 = sliderWidth * (60/100);
+  var width20 = sliderWidth * (20/100);
+  moveInterval = width60 + 10;
+  startPosition = - moveInterval -(width60 -(width20 - 10));
+
+  ataaSlider.html(structure);
   $('#images-holder').css('height', options.height);
   $('#control-holder').css('height', options.controlheight);
 
-  addImage($('#images-holder .first-image'), imgsArr[0]);
-  addImage($('#images-holder .left-image'), imgsArr[1]);
-  addImage($('#images-holder .main-image'), imgsArr[2]);
-  addImage($('#images-holder .right-image'), imgsArr[3]);
-  addImage($('#images-holder .last-image'), imgsArr[4]);
-  imgsArr[2].active = true;
+  var slidePosition = startPosition;
+  ataaSlider.find('.slide').each(function(i){
+    $(this).html(setImage(imgsArr[i]));
+    $(this).css('left', slidePosition);
+    if(i ==2) $(this).css('padding-top', '0px');
+    slidePosition += moveInterval;
+  });
+
   $('.main-holder p').text(imgsArr[2].desc);
   $('.main-holder p').fadeIn();
 
-  $('.first-image').css('left', firstPosition);
-  $('.left-image').css('left', leftPosition);
-  $('.main-image').css('left', mainPosition);
-  $('.right-image').css('left', rightPosition);
-  $('.last-image').css('left', lastPosition);
-
   startArrowAnimations();
+  acting = false;
 }
 
-function moveLeft(){
-  var key = $('.active img').data('key');
-  imgsArr[key].active = false;
+function moveWrappper(direction){
+  if(acting) {
+    console.log("inacting");
+    return;
+  }
+  acting = true;
   $('.main-holder p').fadeOut();
-
-  var first = $('.first-image');
-  var left = $('.left-image');
-  var main = $('.main-image');
-  var right = $('.right-image');
-  var last = $('.last-image');
-
-  first.animate({
-    left: leftPosition
-    },options.speed);
-  left.animate({
-    left: mainPosition,
-    'padding-top':'0px',
-  },options.speed,function(){
-    left.addClass('active');
-    var newKey = left.find('img').data('key');
-    imgsArr[newKey].active = true;
-    $('.main-holder p').text(imgsArr[newKey].desc);
+  move(direction, function(key){
+    $('.main-holder p').text(imgsArr[key].desc);
     $('.main-holder p').fadeIn();
-    var tempImg = imgsArr.pop();
-    imgsArr.unshift(tempImg);
-    addImage(last, tempImg);
-  });
-  main.animate({
-    'padding-top':'50px',
-    left: rightPosition
-  },options.speed ,function(){
-    main.removeClass('active');
-  });
-  right.animate({
-    left: lastPosition
-  },options.speed);
-  last.css('left',firstPosition);
-
-  first.addClass('left-image');
-  left.addClass('main-image');
-  main.addClass('right-image');
-  right.addClass('last-image');
-  last.addClass('first-image');
-
-  first.removeClass('first-image');
-  left.removeClass('left-image');
-  main.removeClass('main-image');
-  right.removeClass('right-image');
-  last.removeClass('last-image');
-
+    acting = false;
+  })
 
 }
 
-function moveRight(){
-  var key = $('.active img').data('key');
-  console.log(key);
-  imgsArr[key].active = false;
-  $('.main-holder p').fadeOut();
+function move(direction, cb){
 
-  var first = $('.first-image');
-  var left = $('.left-image');
-  var main = $('.main-image');
-  var right = $('.right-image');
-  var last = $('.last-image');
+  var ready = 0;
+  var activeSlider = $(ataaSlider.find('.slide')[2]);
+  var activeImg = activeSlider.find('img').data('key');
+  var interval = direction * moveInterval;
+  var actveKey = 0;
+  ataaSlider.find('.slide').each(function(i){
+    var left =parseInt($(this).position().left + interval) ;
+     if((direction == -1 && i == 3) || (direction == 1 && i == 1)){
+      padding = '0px';
+         actveKey = $(this).find('img').data('key');
+     }else {
+      padding = '50px';
+    }
+    $(this).animate({
+      left: left,
+      'padding-top':padding,
+    },options.speed,function(){
+        ready++;
+    });
+  })
 
+  var whenReady = setInterval(function(){
+    if(ready > 3){
+      clearInterval(whenReady);
+      if(direction == -1){
+        ataaSlider.find('.slide').first().remove();
+        var nextKey = activeImg + 3;
+        if(nextKey >= imgsArr.length ) nextKey -= imgsArr.length;
+        var newLeft = parseInt(ataaSlider.find('.slide').last().position().left + moveInterval);
+        ataaSlider.find('#images-holder').append('<div class="slide" style="left:'+newLeft+'px ;">' +setImage(imgsArr[nextKey]).prop('outerHTML') + '</div>');
 
-
-  last.animate({
-    left:rightPosition
-  },options.speed);
-  right.animate({
-    left: mainPosition,
-    'padding-top':'0px',
-  },options.speed,function(){
-    right.addClass('active');
-    var newKey = right.find('img').data('key');
-    imgsArr[newKey].active = true;
-    $('.main-holder p').text(imgsArr[newKey].desc);
-    $('.main-holder p').fadeIn();
-    var tempImg = imgsArr.shift();
-    imgsArr.push(tempImg);
-    addImage(first, tempImg);
-  });
-
-  main.animate({
-    'padding-top':'50px',
-    left: leftPosition
-  },options.speed ,function(){
-    main.removeClass('active');
-  });
-
-
-  left.animate({
-    left: firstPosition,
-  },options.speed);
-  first.css('left', 'lastPosition');
-
-  first.addClass('last-image');
-  left.addClass('first-image');
-  main.addClass('left-image');
-  right.addClass('main-image');
-  last.addClass('right-image');
-
-  first.removeClass('first-image');
-  left.removeClass('left-image');
-  main.removeClass('main-image');
-  right.removeClass('right-image');
-  last.removeClass('last-image');
-
-
+      }else{
+        ataaSlider.find('.slide').last().remove();
+        var nextKey = activeImg - 3;
+        if(nextKey < 0) nextKey += imgsArr.length;
+        ataaSlider.find('#images-holder').prepend('<div class="slide" style="left:'+startPosition+'px ;">' +setImage(imgsArr[nextKey]).prop('outerHTML') + '</div>');
+      }
+      ready = 0;
+      cb(actveKey);
+    }
+  },100)
 }
 
-function addImage(holder, img){
+function setImage(img){
   var imgHTML = $(imgStructure);
   imgHTML.find('img').attr('src', img['src']);
   imgHTML.find('img').attr('data-key', img['key']);
-  holder.html(imgHTML);
+  if(options.shownames){
+    imgHTML.find('.img-name').text(img.name);
+  }else{
+    imgHTML.find('.img-name').remove();
+  }
+
+  return imgHTML ;
 }
+
 
 function startArrowAnimations(){
   var AnimationSpeed = options.speed * 3;

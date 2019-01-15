@@ -117,3 +117,16 @@
 .second.left{
     right:50%;
 }
+
+#slider-holder{
+    position: relative;
+}
+
+#slider-holder .img-name{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 15px auto;
+    background-color: rgba(255, 251, 251, 0.5);
+    padding: 5px 10px;
+}
