@@ -10,6 +10,7 @@ ataaSlider = null;
 imgsArr = [];
 structure = '<div id="slider-holder">' +
               '<a id="moveRight"></a>' +
+              '<a id="openImage"></a>' +
               '<a id="moveLeft"></a>' +
               '<div id="images-holder">' +
                 '<div class="slide "></div>' +
@@ -25,6 +26,7 @@ structure = '<div id="slider-holder">' +
               '</div>' +
             '</div>';
 imgStructure = '<div class="img-holder"><span class="img-name"></span><img src="" data-key=""></div>';
+imgShowStructure = '<div id="image-show" style="display: none"><span class="image-close"><i class="glyphicon glyphicon-remove" ></i></span><img src="" alt=""></div>';
 options = {};
 moveInterval = 0;
 acting = true;
@@ -39,6 +41,32 @@ $.fn.ataaSlider = function(userOptions){
   $('#moveLeft').on('click',function(){
     moveWrappper(1);
   });
+  if(options.openImage){
+    $('#openImage').on('click', function(){
+      if(acting) {
+        console.log("inacting");
+        return;
+      }
+      acting = true;
+      var key = $(ataaSlider.find('.slide')[2]).find('img').data('key');
+      openimage(imgsArr[key]);
+      $('#image-show').on('click',function(){
+
+        $('body #image-show').fadeOut(function(){
+          $('body #image-show').remove();
+          acting = false;
+        });
+
+      });
+    });
+
+  }else{
+    $('#openImage').remove();
+  }
+
+  window.onresize = function() {
+    sizing();
+  }
 };
 
 $.fn.ataaSlider.defaults =
@@ -46,7 +74,8 @@ $.fn.ataaSlider.defaults =
   shownames: true,
   height: '400',
   controlheight: '100',
-  speed:500
+  speed:500,
+  openImage: true
 };
 
 
@@ -83,6 +112,17 @@ function initialize(){
     i++;
   }
 
+  sizing();
+
+  $('.main-holder p').text(imgsArr[2].desc);
+  $('.main-holder p').fadeIn();
+
+  startArrowAnimations();
+  acting = false;
+}
+
+function sizing(){
+  console.log("here");
   //get positions
   var sliderWidth = ataaSlider.width();
   var width60 = sliderWidth * (60/100);
@@ -101,12 +141,6 @@ function initialize(){
     if(i ==2) $(this).css('padding-top', '0px');
     slidePosition += moveInterval;
   });
-
-  $('.main-holder p').text(imgsArr[2].desc);
-  $('.main-holder p').fadeIn();
-
-  startArrowAnimations();
-  acting = false;
 }
 
 function moveWrappper(direction){
@@ -182,7 +216,6 @@ function setImage(img){
   return imgHTML ;
 }
 
-
 function startArrowAnimations(){
   var AnimationSpeed = options.speed * 3;
   $('.first.right').animate({
@@ -211,4 +244,11 @@ function startArrowAnimations(){
     startArrowAnimations();
   });
 
+}
+
+function openimage(img){
+  var imgHTML = $(imgShowStructure);
+  imgHTML.find('img').attr('src', img['src']);
+  $('body').append(imgHTML);
+  $('#image-show').fadeIn();
 }
