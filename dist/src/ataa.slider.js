@@ -25,7 +25,7 @@ structure = '<div id="slider-holder">' +
                 '<div class="right-holder"><i class="first right glyphicon glyphicon-menu-right"></i><i class="second right glyphicon glyphicon-menu-right"></i></div>' +
               '</div>' +
             '</div>';
-imgStructure = '<div class="img-holder"><span class="img-name"></span><img src="" data-key=""></div>';
+imgStructure = '<div class="img-holder"><span class="img-name"></span><img src="" data-key="" alt=""></div>';
 imgShowStructure = '<div id="image-show" style="display: none"><span class="image-close"><i class="glyphicon glyphicon-remove" ></i></span><img src="" alt=""></div>';
 options = {};
 moveInterval = 0;
@@ -203,8 +203,9 @@ function move(direction, cb){
 
 function setImage(img){
   var imgHTML = $(imgStructure);
-  imgHTML.find('img').attr('src', img['src']);
-  imgHTML.find('img').attr('data-key', img['key']);
+  imgHTML.find('img').attr('src', img.src);
+  imgHTML.find('img').attr('data-key', img.key);
+  imgHTML.find('img').attr('data-alt', img.name);
   if(options.shownames){
     imgHTML.find('.img-name').text(img.name);
   }else{
