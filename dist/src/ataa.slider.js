@@ -111,7 +111,7 @@ function initialize(){
     });
     i++;
   }
-
+  ataaSlider.html(structure);
   sizing();
 
   $('.main-holder p').text(imgsArr[2].desc);
@@ -122,7 +122,6 @@ function initialize(){
 }
 
 function sizing(){
-  console.log("here");
   //get positions
   var sliderWidth = ataaSlider.width();
   var width60 = sliderWidth * (60/100);
@@ -130,9 +129,8 @@ function sizing(){
   moveInterval = width60 + 10;
   startPosition = - moveInterval -(width60 -(width20 - 10));
 
-  ataaSlider.html(structure);
-  $('#images-holder').css('height', options.height);
-  $('#control-holder').css('height', options.controlheight);
+  ataaSlider.find('#images-holder').css('height', options.height);
+  ataaSlider.find('#control-holder').css('height', options.controlheight);
 
   var slidePosition = startPosition;
   ataaSlider.find('.slide').each(function(i){
